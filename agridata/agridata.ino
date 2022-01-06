@@ -8,7 +8,7 @@ const char PINNUMBER[] = SECRET_PINNUMBER;
 const char broker[] = BROKER;
 const String topic = String(BASE_TOPIC) + "/" + String(DEVICE_ID) + "/";
 const int port = PORT;
-const unsigned long interval = HOUR_DELAY * 60 * 60 * 1000;
+const unsigned long interval = MINUTE_DELAY * 60 * 1000;
 unsigned long previousMillis = interval;
 
 // initialize the library instance
@@ -43,34 +43,24 @@ void setup() {
     }
   }
 
-  Serial.println("connecting to the mqtt broker...");
+  Serial.println("Connected to Cellular network.");
+  Serial.print("Sending messages at an interval of: ");
+  Serial.print(interval);
+  Serial.println(" milliseconds.");
 
-  Serial.println(broker);
+  Serial.println("Connecting to mqtt broker.");
+    if (!mqttClient.connect(broker, port)) {
+      Serial.print("MQTT connection failed! Error code = ");
+      Serial.println(mqttClient.connectError());
+    }
+    mqttClient.setTimeout(0);
+    Serial.println("Connected to mqtt broker.");
 
-  if (!mqttClient.connect(broker, port)) {
-    Serial.print("MQTT connection failed! Error code = ");
-    Serial.println(mqttClient.connectError());
-
-    while (1);
-  }
-
-  Serial.println("Connected to the MQTT broker!");
-  Serial.println();
-
-  // send startup message with location coords "lat, long"
-  mqttClient.beginMessage(topic + "location");
-  mqttClient.print("-41.314220, 174.822680");
-  mqttClient.endMessage();
-
-  // generate random number seed
-  randomSeed(analogRead(0));
+    // generate random number seed
+    randomSeed(analogRead(0));
 }
 
 void loop() {
-  // call poll() regularly to allow the library to send MQTT keep alives which
- // avoids being disconnected by the broker
-  mqttClient.poll();
-
   // to avoid having delays in loop, we'll use the strategy from BlinkWithoutDelay
   // see: File -> Examples -> 02.Digital -> BlinkWithoutDelay for more info
   unsigned long currentMillis = millis();
@@ -79,15 +69,16 @@ void loop() {
     // save the last time a message was sent
     previousMillis = currentMillis;
 
-    Serial.print("Sending message to topic: ");
-    Serial.println(topic + "temperature");
-    Serial.print("hello ");
 
     int temp = random(10, 30);
-    mqttClient.beginMessage(topic);
+    Serial.print("Sending message to topic: (");
+    Serial.print(topic + "temperature, ");
+    Serial.print(temp);
+    Serial.println(")");
+    mqttClient.beginMessage(topic + "temperature");
     mqttClient.print(temp);
     mqttClient.endMessage();
+    Serial.println("Sent Message.\n");
 
-    Serial.println();
   }
 }
