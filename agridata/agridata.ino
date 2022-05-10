@@ -24,6 +24,9 @@ void setup() {
   Serial.println("Starting AgriData Sensor Node.");
   Serial.println("Warming up....");
 
+  // Set built in led as an output
+  pinMode(LED_BUILTIN, OUTPUT);
+
   if (!TEST) {
     mySensor.start();
   }
@@ -61,6 +64,7 @@ void loop() {
         mySensor.start();
         int counter = 0;
         while (!mySensor.active()) {
+          digitalWrite(LED_BUILTIN, counter % 2 == 0 ? HIGH : LOW);
           Serial.print(".");
           delay(1000);
           counter++;
