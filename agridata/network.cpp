@@ -5,23 +5,12 @@
  *
  * @param data
  */
-void NetworkClient::send_data(Data data) {
+void NetworkClient::send_data(Data data, String base_topic) {
     // Make sure we are connected to the network and mqtt broker
     connect();
 
     // Publish data
-    send_message(*base_topic + "battery_voltage", data.battery_voltage);
-    send_message(*base_topic + "clockBattery_voltage", data.clockBattery_voltage);
-    send_message(*base_topic + "temperature_celsius", data.temperature_celsius);
-    send_message(*base_topic + "nitrate_mg_P_L", data.nitrate_mg_P_L);
-    send_message(*base_topic + "nitrate_mV", data.nitrate_mV);
-    send_message(*base_topic + "specificConductivity_mS_P_cm", data.specificConductivity_mS_P_cm);
-    send_message(*base_topic + "salinity_psu", data.salinity_psu);
-    send_message(*base_topic + "totalDissolvedSolids_g_P_L", data.totalDissolvedSolids_g_P_L);
-    send_message(*base_topic + "rawCoductivity_uS_P_cm", data.rawCoductivity_uS_P_cm);
-    send_message(*base_topic + "pH_units", data.pH_units);
-    send_message(*base_topic + "pH_mV", data.pH_mV);
-    send_message(*base_topic + "referece_mV", data.referece_mV);
+    send_message(base_topic + "measurement", data.toJson());
 };
 
 /**
@@ -30,7 +19,7 @@ void NetworkClient::send_data(Data data) {
  * @param topic The topic to publish to
  * @param message The message to publish
  */
-void NetworkClient::send_message(String topic, float message) {
+void NetworkClient::send_message(String topic, String message) {
     // publish data to mqtt broker
     mqtt_client.beginMessage(topic);
     mqtt_client.print(message);
@@ -72,7 +61,6 @@ void NetworkClient::connectMQTT() {
     while (!mqtt_client.connect(mqtt_broker, mqtt_port)) {
         // failed, retry
         Serial.print(".");
-        Serial.println(mqtt_client.connectError());
         delay(5000);
 
         // double check if we are connected to the network
