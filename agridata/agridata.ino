@@ -77,6 +77,9 @@ void loop() {
           }
         }
 
+        // turn led off
+        digitalWrite(LED_BUILTIN, LOW);
+
         Serial.println("Sensor active.");
       }
       Serial.println();
