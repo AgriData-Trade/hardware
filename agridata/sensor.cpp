@@ -75,6 +75,7 @@ double Sensor::readSensor(String id) {
 
 Data Sensor::getData() {
     Serial.println("Sensor");
+    takeMeasurement();
     Data data;
 
     data.temperature_kelvin = readSensor("0");

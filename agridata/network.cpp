@@ -10,7 +10,7 @@ void NetworkClient::send_data(Data data, String base_topic) {
     connect();
 
     // Publish data
-    send_message(base_topic + "measurement", data.toJson());
+    send_message(base_topic, data.toJson());
 };
 
 /**
